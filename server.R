@@ -7,7 +7,14 @@ library(tidyverse)
 pretty <- function(xs) {
   prettyNum(round(xs), big.mark = ",")
 }
+
+scale <- function(xs, min = 0, max = 1) {
+  x_min <- min(xs)
+  x_max <- max(xs)
+  (xs - x_min) / (x_max-x_min)
+}
 shinyServer(function(input, output) {
+  ### Variables =======================================
   refresh_rate <- reactive({
     input$fan_freq*2*100*pi*input$fan_size/input$tip_resolution
   })
@@ -29,6 +36,7 @@ shinyServer(function(input, output) {
       mutate(color = "#000000")
   })
 
+  ### Info boxes =======================================
   output$tip_refresh_rate <- renderValueBox({
     valueBox(value = HTML(paste0(pretty(n_leds()), " leds", br(),
                                  "@", pretty(refresh_rate()), "Hz")),
@@ -38,12 +46,16 @@ shinyServer(function(input, output) {
   })
 
   output$full_data_rate <- renderValueBox({
-    valueBox(value = HTML(paste(pretty(data_rate()), "led/s", br(), pretty(data_rate()*24), "bits/s")),
+    valueBox(value = HTML(paste("<div style='text-align: right;'>",
+                                  pretty(data_rate()), "led/s", br(),
+                                  pretty(data_rate()*24), "bits/s",
+                                "</div>")),
              subtitle = "Data rate",
              color = "purple",
              width = 7)
   })
 
+  ### Graphs & data =======================================
   led_df <- reactive({
     phase <- 0
     leds() %>%
@@ -53,16 +65,21 @@ shinyServer(function(input, output) {
   })
 
   output$fan_plot <- renderPlot({
+    print(log(1/max(led_df()$led)))
      led_df() %>%
 
       ggplot() +
-      geom_arc(aes(x0 = 0, y0 = 0, r = led,
-                   end = angle, start = angle - 2*pi/input$pov_freq*input$fan_freq,
-                   alpha = ..index..,
-                   color = factor(sort(x))
+      geom_arc(aes(x0 = 0, y0 = 0, r = led/(input$fan_size*input$led_density),
+                   end = angle,
+                   start = angle - 2*pi/input$pov_freq*input$fan_freq,
+                   alpha = scale(stat(index)),#*log(1/led_df()$led),
+                   color = factor(sort(led_df()$x))
                    )) +
 
+      scale_alpha_identity() +
       scale_color_hue() +
+      xlim(-1., 1.) +
+      ylim(-1., 1.) +
 
       labs(title = NULL, x = NULL, y = NULL, color = NULL) +
       theme_ipsum_rc() +
@@ -70,7 +87,9 @@ shinyServer(function(input, output) {
             axis.text.y = element_blank(),
             panel.grid  = element_blank(),
             legend.position = "none",
-            #plot.background = element_rect(fill = "black")
+            plot.background  = element_rect(fill = "black"),
+            panel.background = element_rect(fill = "black")
+
             ) +
       coord_equal()
   })

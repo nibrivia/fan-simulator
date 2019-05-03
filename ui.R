@@ -13,13 +13,13 @@ shinyUI(dashboardPage(
     p("LED density is low so that rendering is reasonably fast"),
     numericInput("n_blades", "# blades" ,
                 min = 1, step = 1, value = 8),
-    sliderInput("fan_size", "Fan size (m)",
+    numericInput("fan_size", "Fan size (m)",
                 min = 0.1, max = 3, step = .1, value = 2.5),
-    sliderInput("fan_freq", "Fan rotation frequency (Hz)",
+    numericInput("fan_freq", "Fan rotation frequency (Hz)",
                 min = 0, max = 1, value = 1),
-    sliderInput("tip_resolution", "Tip spatial resolution (cm)",
+    numericInput("tip_resolution", "Tip spatial resolution (cm)",
                 min = 0.1, max = 10, value = 2),
-    sliderInput("pov_freq", "Frequency of POV (Hz)",
+    numericInput("pov_freq", "Frequency of POV (Hz)",
                 min = 1, max = 30, value = 10),
     p(a("GitHub", href = "https://github.com/nibrivia/fan-simulator"))
 
@@ -34,7 +34,6 @@ shinyUI(dashboardPage(
     fluidRow(
       box(title = "Fan view (ggplot)",
           collapsible = TRUE,
-          collapsed = TRUE,
           plotOutput("fan_plot", width = "100%"),
           width = 12)
     ),
