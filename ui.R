@@ -19,7 +19,8 @@ shinyUI(dashboardPage(
     sliderInput("tip_resolution", "Tip spatial resolution (cm)",
                 min = 0.1, max = 10, value = 2),
     sliderInput("pov_freq", "Frequence of POV (Hz)",
-                min = 1, max = 30, value = 10)
+                min = 1, max = 30, value = 10),
+    p(a("GitHub", href = "https://github.com/nibrivia/fan-simulator"))
 
   ),
 
