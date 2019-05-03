@@ -1,6 +1,7 @@
-library(hrbrthemes)
-library(shiny)
 library(ggforce)
+library(hrbrthemes)
+library(r2d3)
+library(shiny)
 library(tidyverse)
 
 pretty <- function(xs) {
@@ -47,8 +48,8 @@ shinyServer(function(input, output) {
     phase <- 0
     leds() %>%
       mutate(angle = blade/input$n_blades*2*pi + phase,
-             x     = led*cos(angle),
-             y     = led*sin(angle))
+             x     = led*cos(angle)/(input$fan_size*input$led_density),
+             y     = led*sin(angle)/(input$fan_size*input$led_density))
   })
 
   output$fan_plot <- renderPlot({
@@ -72,7 +73,14 @@ shinyServer(function(input, output) {
             #plot.background = element_rect(fill = "black")
             ) +
       coord_equal()
+  })
 
+  output$fan_d3 <- renderD3({
+    data <- led_df()
+    r2d3(
+      data = data,
+      script = "fan.js"
+    )
   })
 
 })

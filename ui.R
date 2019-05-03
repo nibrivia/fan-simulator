@@ -1,3 +1,4 @@
+library(r2d3)
 library(shiny)
 library(shinydashboard)
 
@@ -18,7 +19,7 @@ shinyUI(dashboardPage(
                 min = 0, max = 1, value = 1),
     sliderInput("tip_resolution", "Tip spatial resolution (cm)",
                 min = 0.1, max = 10, value = 2),
-    sliderInput("pov_freq", "Frequence of POV (Hz)",
+    sliderInput("pov_freq", "Frequency of POV (Hz)",
                 min = 1, max = 30, value = 10),
     p(a("GitHub", href = "https://github.com/nibrivia/fan-simulator"))
 
@@ -32,14 +33,17 @@ shinyUI(dashboardPage(
 
     fluidRow(
       box(title = "Fan view (ggplot)",
-          plotOutput("fan_plot", width = "100%", height = "800px"),
-          width = 12, height = "800px")
+          collapsible = TRUE,
+          collapsed = TRUE,
+          plotOutput("fan_plot", width = "100%"),
+          width = 12)
     ),
 
     fluidRow(
       box(title = "Fan view (D3)",
-          plotOutput("fan_plot", width = "100%", height = "800px"),
-          width = 12, height = "800px")
+          collapsible = TRUE,
+          d3Output("fan_d3"),
+          width = 12)
     )
 
   )
